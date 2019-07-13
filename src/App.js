@@ -3,6 +3,7 @@ import {Tabs, Tab, Button, Table} from 'react-bootstrap';
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker/react'
 import {tasks} from './tasks'
+import axios from 'axios';
 
 import './App.css';
 
@@ -24,6 +25,15 @@ class App extends React.Component {
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions);
     this.setState({tasks})
+    const options = {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+      url: 'https://guarded-garden-24957.herokuapp.com/myTasks?userId=1',
+    }
+    axios(options)
+      .then(tasks => this.setState({tasks}))
   }
 
   updateWindowDimensions() {
