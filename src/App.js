@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tabs, Tab, Button, Table } from 'react-bootstrap'
+import { Button, Table } from 'react-bootstrap'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker/react'
 import axios from 'axios'
@@ -17,6 +17,7 @@ class App extends React.Component {
       zoom: 12,
       center: [48.856614, 2.3522219],
       tasks: [],
+      completedTasks: [],
     }
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this)
   }
@@ -39,6 +40,18 @@ class App extends React.Component {
   handleMarkerClick(taskId) {
     this.setState({ selectedTask: taskId })
   }
+
+  toggleTask = taskId => {
+    this.setState(prevState => {
+      const taskIndex = prevState.completedTasks.findIndex(t => t === taskId)
+      return {
+        completedTasks:
+          taskIndex === -1 ? [...prevState.completedTasks, taskId] : prevState.completedTasks.filter(t => t !== taskId),
+      }
+    })
+  }
+
+  isTaskDone = id => this.state.completedTasks.findIndex(t => t === id) !== -1
 
   render() {
     const { tasks } = this.state
@@ -78,7 +91,12 @@ class App extends React.Component {
                   <th>{task.dueTime}</th>
                   <td>0628764802</td>
                   <td>
-                    <Button variant="primary">Done</Button>
+                    <Button
+                      variant={this.isTaskDone(task.id) ? 'secondary ' : 'primary'}
+                      onClick={() => this.toggleTask(task.id)}
+                    >
+                      {this.isTaskDone(task.id) ? 'Done' : 'Mark as done'}
+                    </Button>
                   </td>
                 </tr>
               ))}
