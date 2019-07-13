@@ -3,12 +3,15 @@ import { Button, Table } from 'react-bootstrap'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker/react'
 import axios from 'axios'
+import AdminApp from './AdminApp'
 
 import './App.css'
 
 class App extends React.Component {
   constructor(props, context) {
     super(props, context)
+    const urlParams = new URLSearchParams(window.location.search)
+
     this.state = {
       key: 'map',
       width: 0,
@@ -18,6 +21,7 @@ class App extends React.Component {
       center: [48.856614, 2.3522219],
       tasks: [],
       completedTasks: [],
+      userId: urlParams.get('userId'),
     }
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this)
   }
@@ -25,13 +29,14 @@ class App extends React.Component {
   componentDidMount() {
     this.updateWindowDimensions()
     window.addEventListener('resize', this.updateWindowDimensions)
-    const urlParams = new URLSearchParams(window.location.search)
-    const options = {
-      method: 'GET',
-      headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' },
-      url: `https://guarded-garden-24957.herokuapp.com/myTasks?userId=${urlParams.get('userId')}`,
+    if (this.state.userId !== 'admin') {
+      const options = {
+        method: 'GET',
+        headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' },
+        url: `https://guarded-garden-24957.herokuapp.com/myTasks?userId=${this.state.userId}`,
+      }
+      axios(options).then(({ data }) => this.setState({ tasks: data }))
     }
-    axios(options).then(({ data }) => this.setState({ tasks: data }))
   }
 
   updateWindowDimensions() {
@@ -55,6 +60,7 @@ class App extends React.Component {
   isTaskDone = id => this.state.completedTasks.findIndex(t => t === id) !== -1
 
   render() {
+    if (this.state.userId === 'admin') return <AdminApp />
     const { tasks } = this.state
     return (
       <div>
