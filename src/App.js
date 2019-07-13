@@ -25,10 +25,11 @@ class App extends React.Component {
   componentDidMount() {
     this.updateWindowDimensions()
     window.addEventListener('resize', this.updateWindowDimensions)
+    const urlParams = new URLSearchParams(window.location.search)
     const options = {
       method: 'GET',
       headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' },
-      url: 'https://guarded-garden-24957.herokuapp.com/myTasks?userId=1',
+      url: `https://guarded-garden-24957.herokuapp.com/myTasks?userId=${urlParams.get('userId')}`,
     }
     axios(options).then(({ data }) => this.setState({ tasks: data }))
   }
